@@ -1,0 +1,6 @@
+<?php
+
+//File to read config from
+$configFile = $argv[1] ?? 'config.yaml';
+$config = yaml_parse($configFile);
+print_r($config);
