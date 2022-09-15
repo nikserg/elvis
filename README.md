@@ -10,7 +10,7 @@ It can be used to, for example, monthly update changelogs or documentation pages
 
 Elvis makes these steps:
 
-1. Cone repository
+1. Clone repository
 2. Checkout defined branch
 3. Perform set of commands inside repository's folder
 4. If any new files created, add them to repository
