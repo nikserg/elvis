@@ -1,6 +1,115 @@
 <?php
 
+echo "-- Elvis --\n";
 //File to read config from
-$configFile = $argv[1] ?? 'config.yaml';
-$config = yaml_parse($configFile);
-print_r($config);
+$configFile = '/config.yaml';
+$config = yaml_parse_file($configFile);
+
+//Defined actions
+$actions = $config['actions'] ?? [];
+
+//Defined servers
+$repositories = $config['repositories'] ?? [];
+
+//Default server settings
+$defaults = $config['defaults'] ?? [];
+
+$totalRepositories = count($repositories);
+echo count($actions) . ' actions and ' . $totalRepositories . " repositories in config\n";
+
+//Hosts added to known
+$knownHosts = [];
+
+//Loop through servers and perform actions on each
+foreach ($repositories as $repositoryIndex => $repository) {
+    if (!isset($repository['url'])) {
+        echo "No url provided for repository. Config: " . print_r($repository, true) . "\n";
+        continue;
+    }
+    if (empty($repository['actions'])) {
+        echo "No actions provided for repository. Config: " . print_r($repository, true) . "\n";
+        continue;
+    }
+    $branch = $repository['branch'] ?? $defaults['branch'] ?? 'main';
+
+    $repositoryUrl = $repository['url'];
+    echo 'Repository ' . ($repositoryIndex + 1) . '/' . $totalRepositories . ': ' . $repositoryUrl . "\n";
+
+    //SSH key to connect to repository
+    $sshPrivateKey = $repository['private key'] ?? $defaults['private key'] ?? null;
+    if ($sshPrivateKey == null) {
+        echo "No private key found to connect to this repository \n";
+        continue;
+    }
+
+    //Add host to known, if needed
+    $host = getGitHost($repositoryUrl);
+    if (!in_array($host, $knownHosts)) {
+        echo "   Adding host $host to known...\n";
+        shell_exec('ssh-keyscan ' . $host . ' >> /root/.ssh/known_hosts');
+        $knownHosts[] = $host;
+    }
+
+    //Install private key
+    echo "   Installing private key...\n";
+    file_put_contents('/root/.ssh/id_rsa', $sshPrivateKey);
+    shell_exec('chmod 600 /root/.ssh/id_rsa');
+
+    //Create folder for repository
+    mkdir('/repo');
+    echo "   Cloning repository...\n";
+
+    $result = shell_exec('git clone ' . $repository['url'] . ' /repo');
+    echo "   Repository cloned \n";
+
+    //Checking out branch
+    echo "   Checking out branch $branch \n";
+    shell_exec("cd /repo && git checkout $branch");
+
+    //Setting credentials
+    $name = $repository['git name'] ?? $defaults['git name'] ?? 'Elvis Presley';
+    $email = $repository['git email'] ?? $defaults['git email'] ?? 'elvis@example.com';
+    echo "   Setting credential as $name <$email> \n";
+    shell_exec('git config --global user.email "' . $email . '"');
+    shell_exec('git config --global user.name "' . $name . '"');
+
+    //Performing actions on repository
+    $totalActions = count($repository['actions']);
+    foreach ($repository['actions'] as $actionIndex => $actionName) {
+        echo "   Action " . ($actionIndex + 1) . "/" . $totalActions . ": $actionName\n";
+        if (!isset($actions[$actionName])) {
+            echo "   Unknown action. Skipping\n";
+            continue;
+        }
+        $action = $actions[$actionName];
+        $commands = $action['commands'];
+        $totalCommands = count($commands);
+        foreach ($commands as $commandIndex => $command) {
+            echo "      Command " . ($commandIndex + 1) . "/$totalCommands: $command \n";
+            $result = shell_exec('cd /repo && ' . $command);
+            echo "      Result: $result\n";
+        }
+
+        //Committing changes
+        echo "   Committing changes\n";
+        $commitMessage = $action['commit message'] ?? 'Elvis';
+        shell_exec('cd /repo && git commit -m "' . $commitMessage . '"');
+
+        echo "   Pushing back to $branch\n";
+        $result = shell_exec('cd /repo && git push');
+        echo "   Pushing result: $result \n";
+    }
+
+}
+
+echo "All done! Bye Elvis!\n";
+
+function getGitHost($gitString)
+{
+    //Get host from SSH repo
+    preg_match('/git@(.+):/U', $gitString, $matches);
+
+    //@todo get host from https repo
+
+    return $matches[1];
+}
