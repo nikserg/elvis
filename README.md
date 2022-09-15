@@ -7,14 +7,13 @@ Elvis is a simple open-source automation tool for periodical operations on Git r
 
 ## Usage
 
-`docker run -v config.yaml:/config.yaml nikserg/elvis`
+### Linux
 
-If there are docker commands in your config:
+`docker run -v $(pwd)/config.yaml:/config.yaml -v "/var/run/docker.sock:/var/run/docker.sock" nikserg/elvis`
 
-```shell
-docker run --privileged --name dind -d docker:dind
-docker run --rm --link dind:docker -v config.yaml:/config.yaml nikserg/elvis
-```
+### Windows
+
+`docker run -v %cd%\config.yaml:/config.yaml -v "//var/run/docker.sock:/var/run/docker.sock" nikserg/elvis`
 
 ## For contributors
 
