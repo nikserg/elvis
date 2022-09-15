@@ -1,8 +1,10 @@
 <?php
 
+echo "===========\n";
 echo "-- Elvis --\n";
+echo "===========\n";
 //File to read config from
-$configFile = '/config.yaml';
+$configFile = '/workdir/config.yaml';
 $config = yaml_parse_file($configFile);
 
 //Defined actions
@@ -33,7 +35,8 @@ foreach ($repositories as $repositoryIndex => $repository) {
     $branch = $repository['branch'] ?? $defaults['branch'] ?? 'main';
 
     $repositoryUrl = $repository['url'];
-    echo 'Repository ' . ($repositoryIndex + 1) . '/' . $totalRepositories . ': ' . $repositoryUrl . "\n";
+    echo "\n";
+    echo '---- Repository ' . ($repositoryIndex + 1) . '/' . $totalRepositories . ': ' . $repositoryUrl . " ----\n";
 
     //SSH key to connect to repository
     $sshPrivateKey = $repository['private key'] ?? $defaults['private key'] ?? null;
@@ -45,61 +48,71 @@ foreach ($repositories as $repositoryIndex => $repository) {
     //Add host to known, if needed
     $host = getGitHost($repositoryUrl);
     if (!in_array($host, $knownHosts)) {
-        echo "   Adding host $host to known...\n";
+        echo "Adding host $host to known...\n";
         shell_exec('ssh-keyscan ' . $host . ' >> /root/.ssh/known_hosts');
         $knownHosts[] = $host;
     }
 
     //Install private key
-    echo "   Installing private key...\n";
+    echo " Installing private key...\n";
     file_put_contents('/root/.ssh/id_rsa', $sshPrivateKey);
     shell_exec('chmod 600 /root/.ssh/id_rsa');
 
     //Create folder for repository
-    mkdir('/repo');
-    echo "   Cloning repository...\n";
+    mkdir('/workdir/repo');
+    try {
+        echo "Cloning repository...\n";
 
-    $result = shell_exec('git clone ' . $repository['url'] . ' /repo');
-    echo "   Repository cloned \n";
+        $result = shell_exec('git clone ' . $repository['url'] . ' /workdir/repo');
+        echo "Repository cloned. \n";
 
-    //Checking out branch
-    echo "   Checking out branch $branch \n";
-    shell_exec("cd /repo && git checkout $branch");
+        //Checking out branch
+        echo "Checking out branch $branch \n";
+        shell_exec("cd /workdir/repo && git checkout $branch");
 
-    //Setting credentials
-    $name = $repository['git name'] ?? $defaults['git name'] ?? 'Elvis Presley';
-    $email = $repository['git email'] ?? $defaults['git email'] ?? 'elvis@example.com';
-    echo "   Setting credential as $name <$email> \n";
-    shell_exec('git config --global user.email "' . $email . '"');
-    shell_exec('git config --global user.name "' . $name . '"');
+        //Setting credentials
+        $name = $repository['git name'] ?? $defaults['git name'] ?? 'Elvis Presley';
+        $email = $repository['git email'] ?? $defaults['git email'] ?? 'elvis@example.com';
+        echo "Setting credentials as $name <$email> \n";
+        shell_exec('git config --global user.email "' . $email . '"');
+        shell_exec('git config --global user.name "' . $name . '"');
 
-    //Performing actions on repository
-    $totalActions = count($repository['actions']);
-    foreach ($repository['actions'] as $actionIndex => $actionName) {
-        echo "   Action " . ($actionIndex + 1) . "/" . $totalActions . ": $actionName\n";
-        if (!isset($actions[$actionName])) {
-            echo "   Unknown action. Skipping\n";
-            continue;
+        //Performing actions on repository
+        $totalActions = count($repository['actions']);
+        foreach ($repository['actions'] as $actionIndex => $actionName) {
+            echo "\n";
+            echo "-- Action " . ($actionIndex + 1) . "/" . $totalActions . ": $actionName --\n";
+            if (!isset($actions[$actionName])) {
+                echo "   Unknown action. Skipping\n";
+                continue;
+            }
+            $action = $actions[$actionName];
+            $commands = $action['commands'];
+            $totalCommands = count($commands);
+            foreach ($commands as $commandIndex => $command) {
+                echo "- Command " . ($commandIndex + 1) . "/$totalCommands: $command -\n";
+                $result = shell_exec($command);
+                if ($result) {
+                    $result .= "\n";
+                }
+                echo $result;
+            }
+
+            echo "Commands done.\n";
+            //Committing changes
+            echo "Committing changes...\n";
+            $commitMessage = $action['commit message'] ?? 'Elvis';
+            shell_exec('cd /workdir/repo && git commit -m "' . $commitMessage . '"');
+
+            echo "Pushing back to $branch...\n";
+            shell_exec('cd /workdir/repo && git push');
         }
-        $action = $actions[$actionName];
-        $commands = $action['commands'];
-        $totalCommands = count($commands);
-        foreach ($commands as $commandIndex => $command) {
-            echo "      Command " . ($commandIndex + 1) . "/$totalCommands: $command \n";
-            $result = shell_exec('cd /repo && ' . $command);
-            echo "      Result: $result\n";
-        }
-
-        //Committing changes
-        echo "   Committing changes\n";
-        $commitMessage = $action['commit message'] ?? 'Elvis';
-        shell_exec('cd /repo && git commit -m "' . $commitMessage . '"');
-
-        echo "   Pushing back to $branch\n";
-        $result = shell_exec('cd /repo && git push');
-        echo "   Pushing result: $result \n";
+    } finally {
+        echo "Removing temporary folders...\n";
+        shell_exec('rm -rf /workdir/repo');
     }
 
+    echo "Done with this repository.\n";
 }
 
 echo "All done! Bye Elvis!\n";

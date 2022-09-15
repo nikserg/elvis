@@ -9,11 +9,11 @@ Elvis is a simple open-source automation tool for periodical operations on Git r
 
 ### Linux
 
-`docker run -v $(pwd)/config.yaml:/config.yaml -v "/var/run/docker.sock:/var/run/docker.sock" nikserg/elvis`
+`docker run -v $(pwd):/workdir -v "/var/run/docker.sock:/var/run/docker.sock" nikserg/elvis`
 
 ### Windows
 
-`docker run -v %cd%\config.yaml:/config.yaml -v "//var/run/docker.sock:/var/run/docker.sock" nikserg/elvis`
+`docker run -v %cd%:/workdir -v "//var/run/docker.sock:/var/run/docker.sock" nikserg/elvis`
 
 ## For contributors
 
