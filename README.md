@@ -29,7 +29,7 @@ for user in your Git system (Github, Gitlab).
 
 You can also have separate keys for each repository.
 
-Note, that this user need to have access rights for desired branch.
+Note, that this user need to have write access rights for desired branch.
 
 ## Configuration
 
