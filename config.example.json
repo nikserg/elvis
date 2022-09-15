@@ -1,21 +1,20 @@
 {
+  "defaults": {
+    "private key": "-----BEGIN OPENSSH PRIVATE KEY-----\nSuper secret!\n-----END OPENSSH PRIVATE KEY-----\n"
+  },
   "actions": {
-    "update changelog": {
-      "commit message": "Update CHANGELOG.md",
+    "update guestbook": {
+      "commit message": "Update GUESTBOOK.md",
       "commands": [
-        "echo \"Hi!\"",
-        "docker run -v %cd%/repo:/app gitlab.itcomgk.ru:5050/crm-core-common/changelog-generator"
+        "echo \"Elvis was here\" > GUESTBOOK.md"
       ]
     }
   },
-  "defaults": {
-    "private key": "-----BEGIN RSA PRIVATE KEY-----\n    MIIEogIBAAKCAQEAtYM3+LE4kkxXBEH6lPfHgrUytqp6YMm1O+KFukH+SeBVj35D\n    GrV7xxNIcCQYTn3mIBOv+U9hDLDJOzJQmLQprdEOHksm48lCoc7AM+/ZeUMYUcts\n    zsTTso0AoFFbD8zmGzVGV69lVziOjCNSjFoGs+S5NKiQ/r/nMU8DM98onhxoVHjH\n    nndlb2Dx1vMnamALY4QnOS0uRuBDhxKvN5Fwp4dUM2eWXyQ7xH/fiH5yPo1FGRgf\n    YqSI5bJpvSrU1MvaZn0f2A+dswwW6KE6+JoJzkj3N56ON58fyXHeTVEyDxoyR1JY\n    FZbWeSPQSIoQGHvddnwe0sNUBawV02kTTj5uZQIBJQKCAQBw1QceDUyt+BpqbjP7\n    vJ6dW+FBHd1ewpNA5sHUpZA7ws1nCUxO34RLUS0HcGIi9FDH1OMCwqQcpT7RxVSx\n    83PawDk1bPx/wkwDt99C4TQoyNfEJIHoUNafbGgsTj+GXMZj8K8vlosaivDTp0Em\n    0C2uGI7NtOSCrqR4mOZQrVCZoeg0d/wB+An14fSB+2f5F0yF+9HszWtXBTimeRzK\n    ZqpLSOKGZx6QVe96yMImZKVp2KmyFVz4NNhohSHLHiYl8NzyRx+8S7tJQJh5/tsM\n    iLK1gwk8A+z2Lj0oWgrxjp/PL0SclyHU6xbcCrE7m4sV2+1t7vbqAgoAwLh4PJR8\n    bhetAoGBAOW97j9WYDn09JJvTvfycJ6zQ0UCEsnlnA2Zc/4ZM89jg4zSHu38W/ZV\n    7VkGbmqixpgGjA+HZ3pN5iacem9QywG51Azjrz+EZ73l6+U3JAbkRvxBB9Ax2hla\n    zy3S8nyPCxrw0bNyI/f1HuBDD80NfC4l3BV7kwMQaT2RkxCnfKUBAoGBAMpCIo60\n    OjzYnLSszPeDDLnu+bHmrosuUhJygtC3X23sS78k5Y16lxIYWrJaj4MS5JD0EKbR\n    g976yZJUXoEwtQXvQcmkEw+BJiwR7tP7Ne6OW7R0prAgsksBMzqy/tXOloeSP5q8\n    O3b1hG672RViRNhR3NUsp3iEvucnXktvSFVlAoGBAJUFk560kXGzpY9qy3Bl6C+W\n    34a1PJ6ixhaoufDtwL3fr0aWIeZ6LdA3vIzF5sG1sUAEPyyq21ZAXe+IGBDaddeb\n    IcMr50vLgY/vFY3C5u+2qpXJUS0ZauADjU4n9zwJwgOjID0LxE3PbflAQZnDjtHT\n    XlMfuU4Ye52O2+8giDOtAoGAV3aLe/rowF2rjGZmeN65ZSkSB72zQxrzDuVpAE9L\n    3IHbkO1cWNsQ5Tr2yaqe7JKMWlu0LHZG3PbTtOY2tGgW7c8/CxaEyG8zGfnqvIhO\n    rFk8abXnN2gVv5HQ9snxqJCvy+w3LifiXPSMS4+Ad/MksJIaTlh/xWnWAxfxbLqA\n    JO0CgYEAwtk26Up4CQAK6J2XU1XFQgw2IhbI125W4X8lqCg3zdvlV6mBB/azNimg\n    B/6Qai39MpYs/tkYPGXmQzjwfUx38vSZaXmDRkW0ERHKR5Vb4Mxiv7aXvxxOhrQE\n    kq5tL2ZkRRQmCvUQgZ8WnDyNHNXF0Klof8nh5AHhf+icJE9/yDY=\n    -----END RSA PRIVATE KEY-----"
-  },
   "repositories": [
     {
-      "url": "git@gitlab.itcomgk.ru:crm-core-common/changelog-generator.git",
+      "url": "git@github.com:nikserg/elvis.git",
       "actions": [
-        "update changelog"
+        "update guestbook"
       ]
     }
   ]
