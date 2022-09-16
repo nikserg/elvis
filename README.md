@@ -17,11 +17,24 @@ Elvis makes these steps:
 5. Commit changes
 6. Push
 
+## Install and requirements
+
+To run Elvis, you will need
+
+* PHP 7.0+
+* Git
+
+First off, copy `elvis` file from this repository to any folder you have write permissions for,
+because Elvis will create temporary files and folders in this folder.
+Then, create `config.json` file in same folder.
+You can copy its content from example [config.example.json](config.example.json) file.
+Read more about config file below.
+
 ## Usage
 
 `php elvis [config file]`
 
-If no `config file` provided, Elvis expects `config.json` in current directory. More about config file below.
+If no `config file` provided, Elvis expects `config.json` in current directory.
 
 Elvis will use SSH key to clone/push repositories. You can generate a separate key with `ssh-keygen -f pkey`, then
 you will need to copy content of `pkey` file to `private key` in config file, and add `pkey.pub` as SSH key
@@ -85,5 +98,18 @@ List of repositories to clone and perform actions.
 
 * `url` - URL of git repository
 * `actions` - list of actions
+
+Also, you can define list of repositories as list of URLs, if all actions, keys, branches etc. are default.
+Like this:
+
+```json
+{
+  "repositories": [
+    "git@github.com:nikserg/elvis.git",
+    "git@github.com:FriendsOfSymfony/FOSRestBundle.git",
+    "git@github.com:mehdi-fathi/eloquent-filter.git"
+  ]
+}
+```
 
 

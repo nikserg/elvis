@@ -32,6 +32,12 @@ $knownHosts = [];
 
 //Loop through servers and perform actions on each
 foreach ($repositories as $repositoryIndex => $repository) {
+
+    //Short syntax for repository
+    if (is_string($repository)) {
+        $repository = ['url' => $repository];
+    }
+
     if (!isset($repository['url'])) {
         echo "No url provided for repository. Config: " . print_r($repository, true) . "\n";
         continue;
